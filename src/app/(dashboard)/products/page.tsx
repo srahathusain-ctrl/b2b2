@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { getProducts, getVolumePrice } from "@/services/products";
@@ -188,7 +188,7 @@ function ProductCard({ product }: { product: Product }) {
   );
 }
 
-export default function ProductsPage() {
+function ProductsContent() {
   const searchParams = useSearchParams();
   const [category, setCategory] = useState(() => searchParams.get("category") || "All");
   const [application, setApplication] = useState("All Applications");
@@ -299,5 +299,18 @@ export default function ProductsPage() {
 
       <RFQModal products={products || []} />
     </div>
+  );
+}
+
+export default function ProductsPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center py-16 text-muted gap-2">
+        <div className="w-5 h-5 border-2 border-border border-t-gold rounded-full animate-spin" />
+        Loading products…
+      </div>
+    }>
+      <ProductsContent />
+    </Suspense>
   );
 }
